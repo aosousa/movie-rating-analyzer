@@ -20,5 +20,5 @@ type Directors []Director
 func (director Director) PrintStatistics() {
 	ratingAverage := maths.Average(director.Ratings)
 
-	fmt.Printf("%s: %f\n", director.Name, ratingAverage)
+	fmt.Printf("%s: %.2f\n", director.Name, ratingAverage)
 }

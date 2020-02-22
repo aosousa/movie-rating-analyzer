@@ -13,6 +13,16 @@ var (
 )
 
 func main() {
+	createDirectorSlice()
+
+	// loop directors and print their statistics
+	for _, director := range directors {
+		director.PrintStatistics()
+	}
+}
+
+// Populate the slice of directors with data
+func createDirectorSlice() {
 	XLSXLocation := `Movies.xlsx`
 
 	// open XLSX document
@@ -25,50 +35,38 @@ func main() {
 	// loop ratings
 	for _, row := range ratings {
 		director := row[1]
-		rating, _ := strconv.Atoi(strings.Replace(row[2], "/10", "", -1))
-		findOrAddDirector(director, rating)
-	}
-
-	// loop directors and print their statistics
-	for _, director := range directors {
-		director.PrintStatistics()
+		rating, _ := strconv.Atoi(strings.Replace(row[2], "/10", "", -1)) // remove the "/10" section from the ratings column
+		handleDirector(director, rating)
 	}
 }
 
-/*Check if a director already exists in the slice of directors
+/*Handle actions related to the creation or update of a director.
+If a director already exists in the slice of directors, their slice of ratings will be updated.
+Otherwise, a new director will be created and added to the slice of directors
 
 Receives:
 	* director (string) - Name of the director
-
-Returns:
-	* models.Director - Director to use in the event that a director with this name already exists
-	* bool - Whether or not the director has already been added to the slice of directors
+	* rating (int) - Movie rating
 */
-func directorExists(director string) (models.Director, bool) {
-	var tempDirector models.Director
+func handleDirector(director string, rating int) {
+	directorExists := false
 
-	for _, el := range directors {
-		if director == el.Name {
-			return el, true
+	for i := range directors {
+		if director == directors[i].Name {
+			// director exists - simply add rating to the slice
+			directorExists = true
+			directors[i].Ratings = append(directors[i].Ratings, rating)
 		}
 	}
 
-	return tempDirector, false
-}
-
-func findOrAddDirector(director string, rating int) {
-	tempDirector, foundDirector := directorExists(director)
-	if foundDirector {
-		// director exists - simply add rating to the slice
-		tempDirector.Ratings = append(tempDirector.Ratings, rating)
-	} else {
+	if !directorExists {
 		// director does not exist - create director with a Ratings
 		// slice that contains this first value
-		director := models.Director{
+		newDirector := models.Director{
 			Name:    director,
 			Ratings: []int{rating},
 		}
 
-		directors = append(directors, director)
+		directors = append(directors, newDirector)
 	}
 }
