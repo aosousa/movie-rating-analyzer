@@ -79,23 +79,26 @@ Receives:
 func handleDirector(director string, rating int) {
 	directorExists := false
 
-	for i := range directors {
-		if director == directors[i].Name {
-			// director exists - simply add rating to the slice
-			directorExists = true
-			directors[i].Ratings = append(directors[i].Ratings, rating)
-		}
-	}
-
-	if !directorExists {
-		// director does not exist - create director with a Ratings
-		// slice that contains this first value
-		newDirector := models.Director{
-			Name:    director,
-			Ratings: []int{rating},
+	splitDirectors := strings.Split(director, ",")
+	for j := range splitDirectors {
+		individualDirector := strings.TrimSpace(splitDirectors[j])
+		for i := range directors {
+			if individualDirector == directors[i].Name {
+				// director exists - simply add rating to the slice
+				directorExists = true
+				directors[i].Ratings = append(directors[i].Ratings, rating)
+			}
 		}
 
-		directors = append(directors, newDirector)
+		if !directorExists {
+			// director does not exist - create director with a Ratings slice that contains this first value
+			newDirector := models.Director{
+				Name:    individualDirector,
+				Ratings: []int{rating},
+			}
+
+			directors = append(directors, newDirector)
+		}
 	}
 }
 
